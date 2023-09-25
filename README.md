@@ -1,2 +1,2 @@
-# dense-and-sparse
+# sparse-to-dense
 labeling tool
