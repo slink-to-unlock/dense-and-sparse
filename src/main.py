@@ -1,7 +1,5 @@
 # 외장
 import os
-import json
-import pathlib
 import logging
 import sys
 
