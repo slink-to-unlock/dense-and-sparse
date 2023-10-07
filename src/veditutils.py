@@ -31,11 +31,17 @@ def split_video(
     ]
 
     # create split manifest file
-    p = wspath_manager.wsjson_path
-    with open(p, 'r') as f:
+    # NOTE: a manifest file is required to split a video file
+    # to utilize thirdparty/video-splitter
+    wspath_manager.read_raw_path(wsjson_manager, raw_idx)
+
+    with open(wspath_manager.wsjson_path, 'r') as f:
         d = json.load(f)
     for i, clip in enumerate(clips):
-        clip['rename_to'] = os.path.join(wspath_manager.read_clips_dir(wsjson_manager, raw_idx), f'clip_{i}')
+        clip['rename_to'] = os.path.join( # destination path
+            wspath_manager.read_clips_dir(wsjson_manager, raw_idx),
+            f'clip_{i}'
+        )
     with open(wspath_manager.get_splitmanifestfile_path(wsjson_manager, raw_idx), 'w') as f:
         json.dump(clips, f, indent=4, ensure_ascii=False)
 

@@ -48,31 +48,12 @@ def copy_video(
         wspath_manager (WorkSpacePathManager): 알잘딱
         video_path (os.PathLike): 비디오의 경로
     """
-    p = pathlib.Path(video_path)
-    name, ext = p.name, p.suffix
-    logger.info(f'경로 `{os.path.abspath(wspath_manager.raw_dir)}`에 '
-                f'동영상 `{name}`를 복사합니다.')
-
-    def get_new_name(extension=True):
-        new_name = f'raw_{len([])}'  # FIXME
-        if extension:
-            new_name += ext
-        logger.info(f'동영상 `{name}`의 이름을 `{new_name}`으로 변경합니다.')
-        return new_name
-
-    dst_path = os.path.join(wspath_manager.raw_dir, get_new_name())
-    copyutils.copy_with_callback(video_path, dst_path)
-
-    with open(wspath_manager.wsjson_path, 'r') as f:
-        d = json.load(f)
-    wsjson_manager.fn_raws()(d).append({
-        'original_name': name,
-        'raw_name': get_new_name(extension=False),
-        'raw_path': dst_path,
-        'clips_dir': wspath_manager.get_clips_dir(wsjson_manager, 0), # FIXME
-    })
-    with open(wspath_manager.wsjson_path, 'w') as f:
-        json.dump(d, f, indent=4, ensure_ascii=False)
+    wspath_manager.set_clips_dir(wsjson_manager, video_path)
+    logger.info(f'동영상 `{os.path.basename(video_path)}`를 복사합니다.')
+    copyutils.copy_with_callback(
+        video_path,
+        wspath_manager.read_raw_path(wsjson_manager, -1)
+    )
 
 
 if __name__ == '__main__':
