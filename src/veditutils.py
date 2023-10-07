@@ -46,7 +46,7 @@ def split_video(
         json.dump(clips, f, indent=4, ensure_ascii=False)
 
     # run python file
-    py = 'thirdparty/video-splitter/ffmpeg-split.py'
+    py = os.path.join('thirdparty', 'video-splitter', 'ffmpeg-split.py')
     video_path = wspath_manager.read_raw_path(wsjson_manager, raw_idx)
     splitjson_path = wspath_manager.read_splitmanifestfile_path(wsjson_manager, raw_idx)
-    os.system(f'python3 {py} -f {video_path} -m {splitjson_path}')
+    os.system(f'python {py} -f {video_path} -m {splitjson_path}')
