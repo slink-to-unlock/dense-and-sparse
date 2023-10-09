@@ -1,8 +1,13 @@
 import os
 import json
+import logging
+import subprocess
 
 from .timing import Timing
 from .manager import WorkSpacePathManager, WorkSpaceJsonManager
+
+# 로거
+logger = logging.getLogger(__name__)
 
 
 def check_video():
@@ -49,4 +54,10 @@ def split_video(
     py = os.path.join('thirdparty', 'video-splitter', 'ffmpeg-split.py')
     video_path = wspath_manager.read_raw_path(wsjson_manager, raw_idx)
     splitjson_path = wspath_manager.read_splitmanifestfile_path(wsjson_manager, raw_idx)
-    os.system(f'python {py} -f {video_path} -m {splitjson_path}')
+    with open(wspath_manager.get_splitlogfile_path(wsjson_manager, -1), 'w') as f:
+        subprocess.Popen([
+            'python', f'{py}',
+            '-f', f'{video_path}',
+            '-m', f'{splitjson_path}'
+        ], stdout=f, stderr=f)
+    logger.info('동영상을 클립으로 분해하는 작업이 완료되었습니다.')

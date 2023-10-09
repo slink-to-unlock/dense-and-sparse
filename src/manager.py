@@ -181,9 +181,13 @@ class WorkSpacePathManager():
             d = json.load(f)
         return wsjson_manager.fn_video(raw_idx)(d).get('clips_dir')
 
+    def get_splitlogfile_path(self, wsjson_manager: WorkSpaceJsonManager, raw_idx: int):
+        return self.read_splitlogfile_path(wsjson_manager, raw_idx)
+
+    def read_splitlogfile_path(self, wsjson_manager: WorkSpaceJsonManager, raw_idx: int):
+        return os.path.join(self.read_clips_dir(wsjson_manager, raw_idx), 'splitlog.txt')
+
     def get_splitmanifestfile_path(self, wsjson_manager: WorkSpaceJsonManager, raw_idx: int):
-        # NOTE: pathmanager 이 처리 가능한 부분으로, JSON 파일에 등록할 필요가 없음.
-        # TODO: 하지만 추후 일관성을 위해서라도 read 와 분리해볼 것.
         return self.read_splitmanifestfile_path(wsjson_manager, raw_idx)
 
     def read_splitmanifestfile_path(self, wsjson_manager: WorkSpaceJsonManager, raw_idx: int):
