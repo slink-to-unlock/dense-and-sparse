@@ -102,10 +102,10 @@ class WorkSpacePathManager():
         self.wsjson_path = os.path.join(self.ws_dir, 'workspace.json')
         self.raw_dir = os.path.join(self.ws_dir, 'raws')
 
-    def get_rawname(self,
-                    wsjson_manager: WorkSpaceJsonManager,
-                    original_video_path: os.PathLike
-                    ) -> str:
+    def get_raw_name(self,
+                     wsjson_manager: WorkSpaceJsonManager,
+                     original_video_path: os.PathLike
+                     ) -> str:
         """ 이 라이브러리에서 칭하는 'raw'란 'clip'으로 쪼개질 수 있는
             비디오를 의미합니다. 한 번 쪼개진 'clip' 도 다시 'raw'가 될 수 있습니다.
             이때 모든 'raw'와 'clip'은 파일의 이름을 통해 구분됩니다.
@@ -138,11 +138,11 @@ class WorkSpacePathManager():
             newname = f'initial_{cnt}'
         return newname
 
-    def read_rawname(self,
-                     wsjson_manager: WorkSpaceJsonManager,
-                     raw_idx: int = -1,
-                     suffix: bool = True
-                     ) -> str:
+    def read_raw_name(self,
+                      wsjson_manager: WorkSpaceJsonManager,
+                      raw_idx: int = -1,
+                      suffix: bool = True
+                      ) -> str:
         with open(self.wsjson_path, 'r') as f:
             d = json.load(f)
         p = pathlib.Path(wsjson_manager.fn_video(raw_idx)(d).get('raw_name'))
@@ -151,13 +151,18 @@ class WorkSpacePathManager():
             ret += p.suffix
         return ret
 
+    def read_raw_path(self, wsjson_manager: WorkSpaceJsonManager, raw_idx: int):
+        with open(self.wsjson_path, 'r') as f:
+            d = json.load(f)
+        return wsjson_manager.fn_video(raw_idx)(d).get('raw_path')
+
     def set_clips_dir(self,
                       wsjson_manager: WorkSpaceJsonManager,
                       original_video_path: os.PathLike):
         ori = pathlib.Path(original_video_path)
         original_video_fullname = os.path.basename(original_video_path)
 
-        copied_video_newname = self.get_rawname(wsjson_manager, original_video_path)
+        copied_video_newname = self.get_raw_name(wsjson_manager, original_video_path)
         copied_video_newfullname = copied_video_newname + ori.suffix
         if original_video_fullname != copied_video_newfullname:
             logger.info(f'동영상 `{original_video_fullname}`의 이름을 '
@@ -192,8 +197,3 @@ class WorkSpacePathManager():
 
     def read_splitmanifestfile_path(self, wsjson_manager: WorkSpaceJsonManager, raw_idx: int):
         return os.path.join(self.read_clips_dir(wsjson_manager, raw_idx), 'splitmanifest.json')
-
-    def read_raw_path(self, wsjson_manager: WorkSpaceJsonManager, raw_idx: int):
-        with open(self.wsjson_path, 'r') as f:
-            d = json.load(f)
-        return wsjson_manager.fn_video(raw_idx)(d).get('raw_path')
