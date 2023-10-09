@@ -121,14 +121,14 @@ class WorkSpacePathManager():
             str: 새로운 이름
         """
         ori = pathlib.Path(original_video_path)
-        original_video_fullname = ori.name + ori.suffix
+        original_video_fullname = ori.stem + ori.suffix
         newname = ''
         with open(self.wsjson_path, 'r') as f:
             d = json.load(f)
         cnt = 0
         for raw_fullname in wsjson_manager.fn_raw_names()(d):
             if raw_fullname == original_video_fullname:
-                newname = ori.name
+                newname = ori.stem
                 break
             if raw_fullname == f'initial_{cnt}.{ori.suffix}':
                 cnt += 1
@@ -137,6 +137,19 @@ class WorkSpacePathManager():
             assert cnt == 0
             newname = f'initial_{cnt}'
         return newname
+
+    def read_rawname(self,
+                     wsjson_manager: WorkSpaceJsonManager,
+                     raw_idx: int = -1,
+                     suffix: bool = True
+                     ) -> str:
+        with open(self.wsjson_path, 'r') as f:
+            d = json.load(f)
+        p = pathlib.Path(wsjson_manager.fn_video(raw_idx)(d).get('raw_name'))
+        ret = p.stem
+        if suffix:
+            ret += p.suffix
+        return ret
 
     def set_clips_dir(self,
                       wsjson_manager: WorkSpaceJsonManager,
