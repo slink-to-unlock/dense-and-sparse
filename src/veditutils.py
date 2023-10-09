@@ -33,19 +33,6 @@ def split_video(
     # to_dict(Timing(0),Timing(a))
     # to_dict(Timing(a),Timing(b))
     # to_dict(Timing(b),Timing(c))
-    clips=[]
-    times = videoplayer(video_path='')
-    for i, time in enumerate(times):
-        if i == 0:
-            prevtime = time
-            continue
-        else:
-            clips.append(to_dict(Timing(prevtime), Timing(time)))
-        if i == len(times) - 1:
-            break
-        prevtime = time
-
-
 
 
     # create split manifest file
@@ -68,18 +55,17 @@ def split_video(
     video_path = wspath_manager.read_raw_path(wsjson_manager, raw_idx)
     splitjson_path = wspath_manager.read_splitmanifestfile_path(wsjson_manager, raw_idx)
     os.system(f'python {py} -f {video_path} -m {splitjson_path}')
+    clips = []
 
-##########Debuging############################
-# clips=[]
-# times = videoplayer(video_path='C:/Users/Subin/Desktop/Sejong/AI_sink/videoplayer2/test.mp4')
-# # times = [0,1000,70000,800000]
-# for i,time in enumerate(times):
-#     if i==0:
-#         prevtime=time
-#         continue
-#     else:
-#         clips.append(to_dict(Timing(prevtime),Timing(time)))
-#     if i==len(times)-1:
-#         break
-#     prevtime = time
-# print(clips)
+    times = videoplayer(video_path=video_path)
+    for i, time in enumerate(times):
+        if i == 0:
+            prevtime = time
+            continue
+        else:
+            clips.append(to_dict(Timing(prevtime), Timing(time)))
+        if i == len(times) - 1:
+            break
+        prevtime = time
+
+
