@@ -2,6 +2,10 @@
 import os
 import logging
 import sys
+import time
+
+# 서드파티
+import pick
 
 logging.basicConfig(
     format=f'(%(asctime)s)[%(levelname)s]:%(module)s: %(message)s',
@@ -31,6 +35,7 @@ def create_workspace(
         f'경로 `{os.path.abspath(parent_dir)}`에 워크스페이스 `{name_ws}`를 생성합니다.')
     os.mkdir(wspath_manager.raw_dir)
     wsjson_manager.create_json(wspath_manager.wsjson_path)
+    time.sleep(3)
     return wspath_manager
 
 
@@ -54,15 +59,53 @@ def copy_video(
     )
 
 
+def cli_selector(
+    wspath_manager: WorkSpaceJsonManager,
+    wsjson_manager: WorkSpaceJsonManager
+) -> (int, os.PathLike):
+    li = wspath_manager.atomic_videos(wsjson_manager)
+    ret, idx = pick.pick([e.name for e in li] + ['exit'])
+    if ret == 'exit':
+        return -1, None
+    video_path = li[idx].video_path
+    logger.info(f'{video_path} 가 선택되었습니다.')
+    return idx, video_path
+
+
+def vis_tree(
+    wspath_manager: WorkSpacePathManager,
+    wsjson_manager: WorkSpaceJsonManager
+) -> None:
+    tree = wspath_manager.get_videos_relationtree(wsjson_manager)
+    clear = lambda: os.system('clear')
+    clear()
+    from anytree import RenderTree
+    for pre, fill, node in RenderTree(tree):
+        print("%s%s" % (pre, node.name))
+
+
 if __name__ == '__main__':
     wsjson_manager = WorkSpaceJsonManager()
-    wspath_manager = create_workspace(wsjson_manager, '.')
-    wspath_manager = WorkSpacePathManager('.', 'anonymous-ws')
-    copy_video(wspath_manager, wsjson_manager, '연호설거지_1.MOV.mov')
-    veditutils.split_video(wspath_manager, wsjson_manager, 0)
+    wspath_manager = WorkSpacePathManager('.', 'test-ws')
+    try:
+        create_workspace(wsjson_manager, '.', name_ws='test-ws')
+    except FileExistsError:
+        logger.error('워크스페이스를 새로 만들 수 없습니다. '
+                     f'워크스페이스 `{wspath_manager.ws_dir}`가 이미 존재합니다.')
+        raise NotImplementedError()
 
-# TODO: 구현 목표
-# 처음 올라간 것의 이름은 initial_{i} 로 한다.
-# 클립을 나누면 initial_{i} 폴더 내에 initial_{i}_clip_{i} 로 한다.
-# initial_{i}_clip_{i} 는 또다시 raws 폴더 안에 들어갈 수 있다.
-# 이것들은 또다시 클립들로 나누어질 수 있다.
+    first = True
+    while True:
+        if first:
+            copy_video(wspath_manager, wsjson_manager, '연호설거지_1.MOV.mov')
+            first = False
+        else:
+            _, video_path = cli_selector(wspath_manager, wsjson_manager)
+            if video_path is None:
+                vis_tree(wspath_manager, wsjson_manager)
+                break
+            copy_video(wspath_manager, wsjson_manager, video_path)
+        veditutils.split_video(wspath_manager, wsjson_manager, -1)
+        vis_tree(wspath_manager, wsjson_manager)
+        logger.info('5초 뒤 다음 동영상을 선택합니다.')
+        time.sleep(5)

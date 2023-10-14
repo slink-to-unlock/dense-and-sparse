@@ -3,6 +3,9 @@ import json
 import pathlib
 import logging
 
+# 서드파티
+import anytree
+
 # 로거
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -102,10 +105,10 @@ class WorkSpacePathManager():
         self.wsjson_path = os.path.join(self.ws_dir, 'workspace.json')
         self.raw_dir = os.path.join(self.ws_dir, 'raws')
 
-    def get_raw_name(self,
-                     wsjson_manager: WorkSpaceJsonManager,
-                     original_video_path: os.PathLike
-                     ) -> str:
+    def get_raw_newstem(self,
+                        wsjson_manager: WorkSpaceJsonManager,
+                        original_video_path: os.PathLike
+                        ) -> str:
         """ 이 라이브러리에서 칭하는 'raw'란 'clip'으로 쪼개질 수 있는
             비디오를 의미합니다. 한 번 쪼개진 'clip' 도 다시 'raw'가 될 수 있습니다.
             이때 모든 'raw'와 'clip'은 파일의 이름을 통해 구분됩니다.
@@ -120,36 +123,36 @@ class WorkSpacePathManager():
         Returns:
             str: 새로운 이름
         """
-        ori = pathlib.Path(original_video_path)
-        original_video_fullname = ori.stem + ori.suffix
-        newname = ''
         with open(self.wsjson_path, 'r') as f:
             d = json.load(f)
-        cnt = 0
-        for raw_fullname in wsjson_manager.fn_raw_names()(d):
-            if raw_fullname == original_video_fullname:
-                newname = ori.stem
-                break
-            if raw_fullname == f'initial_{cnt}.{ori.suffix}':
-                cnt += 1
-                newname = f'initial_{cnt}'
-        if not newname:
-            assert cnt == 0
-            newname = f'initial_{cnt}'
-        return newname
+        if len(wsjson_manager.fn_raws()(d)):
+            newstem = pathlib.Path(original_video_path).stem
+        else:
+            newstem = f'initial_0'
+        return newstem
 
     def read_raw_name(self,
                       wsjson_manager: WorkSpaceJsonManager,
                       raw_idx: int = -1,
-                      suffix: bool = True
-                      ) -> str:
+                      suffix: bool = True,
+                      to_tuple: bool = True,
+                      ):
+        """
+        Returns:
+            string or tuple: 'stem', 'stem.suffix',
+                ('stem', '.suffix') 중 하나를 리턴합니다.
+        """
+        if not suffix:
+            assert not to_tuple, 'suffix 를 return하지 않기 바라는 상황에서는 튜플을 반환하지 않습니다.'
         with open(self.wsjson_path, 'r') as f:
             d = json.load(f)
         p = pathlib.Path(wsjson_manager.fn_video(raw_idx)(d).get('raw_name'))
-        ret = p.stem
         if suffix:
-            ret += p.suffix
-        return ret
+            if to_tuple:
+                return (p.stem, p.suffix)
+            else:
+                return p.stem + p.suffix
+        return p.stem
 
     def read_raw_path(self, wsjson_manager: WorkSpaceJsonManager, raw_idx: int):
         with open(self.wsjson_path, 'r') as f:
@@ -160,21 +163,21 @@ class WorkSpacePathManager():
                       wsjson_manager: WorkSpaceJsonManager,
                       original_video_path: os.PathLike):
         ori = pathlib.Path(original_video_path)
-        original_video_fullname = os.path.basename(original_video_path)
+        original_video_name = os.path.basename(original_video_path)
 
-        copied_video_newname = self.get_raw_name(wsjson_manager, original_video_path)
-        copied_video_newfullname = copied_video_newname + ori.suffix
-        if original_video_fullname != copied_video_newfullname:
-            logger.info(f'동영상 `{original_video_fullname}`의 이름을 '
-                        f'`{copied_video_newfullname}`으로 변경합니다.')
+        copied_video_newstem = self.get_raw_newstem(wsjson_manager, original_video_path)
+        copied_video_newname = copied_video_newstem + ori.suffix
+        if original_video_name != copied_video_newname:
+            logger.info(f'동영상 `{original_video_name}`의 이름을 '
+                        f'`{copied_video_newname}`으로 변경합니다.')
 
-        clips_dirname = copied_video_newname
+        clips_dirname = copied_video_newstem
         clips_dirpath = os.path.join(self.ws_dir, clips_dirname)
 
         t = wsjson_manager.template_newraw(
-            original_video_fullname,
-            copied_video_newfullname,
-            os.path.join(self.raw_dir, copied_video_newfullname),
+            original_video_name,
+            copied_video_newname,
+            os.path.join(self.raw_dir, copied_video_newname),
             clips_dirpath
         )
         wsjson_manager.append(self.wsjson_path, t, wsjson_manager.fn_raws())
@@ -197,3 +200,40 @@ class WorkSpacePathManager():
 
     def read_splitmanifestfile_path(self, wsjson_manager: WorkSpaceJsonManager, raw_idx: int):
         return os.path.join(self.read_clips_dir(wsjson_manager, raw_idx), 'splitmanifest.json')
+
+    def get_splitted_videofile_paths(self, wsjson_manager: WorkSpaceJsonManager, raw_idx: int):
+        p = self.read_splitmanifestfile_path(wsjson_manager, raw_idx)
+        with open(p, 'r') as f:
+            d = json.load(f)
+        return [e.get('rename_to') for e in d]
+
+    def get_videos_relationtree(self,
+                                wsjson_manager: WorkSpaceJsonManager
+                                ) -> anytree.Node:
+        # FIXME: 현재 이 함수는 매우 비효율적입니다.
+        with open(self.wsjson_path, 'r') as f:
+            d = json.load(f)
+
+        root = anytree.Node(self._name_ws)
+        for idx, e in enumerate(wsjson_manager.fn_raws()(d)):
+            # 1. 트리에서 해당 이름의 노드가 있는지 찾는다.
+            name = e.get('raw_name')
+            node = anytree.search.find(root, filter_=lambda node: node.name == name)
+            if not node:
+                # 2. 해당 이름의 노드가 없다면 새로 만든다.
+                node = anytree.Node(name, video_path=e.get('raw_path'))
+                # 2-1. 새로 만드는 경우에는 부모를 적절히 등록한다.
+                # NOTE: 현재 로직상 (fn_raws()를 이용해 이터레이션) 새로운 노드는 반드시 루트이다.
+                node.parent = root
+            # 3. 해당 노드에 자식들을 붙인다.
+            for p in self.get_splitted_videofile_paths(wsjson_manager, idx):
+                anytree.Node(os.path.basename(p), parent=node, video_path=p)
+        return root
+
+    def atomic_videos(self, wsjson_manager: WorkSpaceJsonManager):
+        tree = self.get_videos_relationtree(wsjson_manager)
+        return anytree.search.findall(tree, filter_=lambda node: node.is_leaf)
+
+
+if __name__ == '__main__':
+    pass

@@ -43,9 +43,10 @@ def split_video(
     with open(wspath_manager.wsjson_path, 'r') as f:
         d = json.load(f)
     for i, clip in enumerate(clips):
-        clip['rename_to'] = os.path.join( # destination path
+        stem, suffix = wspath_manager.read_raw_name(wsjson_manager)
+        clip['rename_to'] = os.path.join(
             wspath_manager.read_clips_dir(wsjson_manager, raw_idx),
-            f'{wspath_manager.read_raw_name(wsjson_manager, suffix=False)}_clip_{i}'
+            f'{stem}_clip_{i}{suffix}'
         )
     with open(wspath_manager.get_splitmanifestfile_path(wsjson_manager, raw_idx), 'w') as f:
         json.dump(clips, f, indent=4, ensure_ascii=False)
