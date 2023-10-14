@@ -3,16 +3,29 @@ import json
 import logging
 import subprocess
 
-from .timing import Timing
+from .timing import Timing,videoplayer,to_dict
 from .manager import WorkSpacePathManager, WorkSpaceJsonManager
 
 # 로거
 logger = logging.getLogger(__name__)
 
 
-def check_video():
-    _ = input()
-    pass
+def check_video(
+    video_path: os.PathLike
+) -> list:
+    clips = []
+    times = videoplayer(video_path)
+    for i, time in enumerate(times):
+        if i == 0:
+            prevtime = time
+            continue
+        else:
+            clips.append(to_dict(Timing(prevtime), Timing(time)))
+        if i == len(times) - 1:
+            break
+        prevtime = time
+
+    return clips
 
 
 def split_video(
@@ -20,26 +33,11 @@ def split_video(
     wsjson_manager: WorkSpaceJsonManager,
     raw_idx: int,
 ):
-    clips = [ # FIXME: Timing 클래스를 사용하도록 변경해야 함.
-        {
-            "start_time": 0,
-            "length": 34,
-        },
-        {
-            "start_time": 35,
-            "length": 22,
-        },
-        {
-            "start_time": 50,
-            "end_time": "00:01:20",
-        }
-    ]
-
+    video_path = wspath_manager.read_raw_path(wsjson_manager, raw_idx)
+    clips = check_video(video_path)
     # create split manifest file
     # NOTE: a manifest file is required to split a video file
     # to utilize thirdparty/video-splitter
-    wspath_manager.read_raw_path(wsjson_manager, raw_idx)
-
     with open(wspath_manager.wsjson_path, 'r') as f:
         d = json.load(f)
     for i, clip in enumerate(clips):
@@ -53,7 +51,6 @@ def split_video(
 
     # run python file
     py = os.path.join('thirdparty', 'video-splitter', 'ffmpeg-split.py')
-    video_path = wspath_manager.read_raw_path(wsjson_manager, raw_idx)
     splitjson_path = wspath_manager.read_splitmanifestfile_path(wsjson_manager, raw_idx)
     with open(wspath_manager.get_splitlogfile_path(wsjson_manager, -1), 'w') as f:
         subprocess.Popen([
