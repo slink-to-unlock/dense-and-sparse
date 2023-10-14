@@ -1,4 +1,6 @@
+# 서드파티
 import cv2
+
 class Timing:
     def __init__(self, misec_: int) -> None:
         assert misec_ >= 0 and type(misec_) is int
@@ -69,4 +71,3 @@ if __name__ == '__main__':
     print(123456)
     print(Timing(123456))
     print(to_dict(Timing(0),Timing(123456)))
-
