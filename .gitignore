@@ -190,3 +190,6 @@ Temporary Items
 # Project
 *.mov
 *-ws
+
+# vscode
+.vscode
