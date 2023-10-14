@@ -3,7 +3,7 @@ import json
 import logging
 import subprocess
 
-from .timing import Timing,videoplayer,to_dict
+from .timing import videoplayer
 from .manager import WorkSpacePathManager, WorkSpaceJsonManager
 
 # 로거
@@ -20,7 +20,7 @@ def check_video(
             prevtime = time
             continue
         else:
-            clips.append(to_dict(Timing(prevtime), Timing(time)))
+            clips.append(prevtime.until(time))
         if i == len(times) - 1:
             break
         prevtime = time
