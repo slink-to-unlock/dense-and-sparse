@@ -10,11 +10,61 @@ import anytree
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-class WorkSpaceJsonManager():
+
+class JsonManager():
     def __init__(self) -> None:
         pass
 
-    def create_json(self, path):
+
+class ResultJsonManager(JsonManager):
+    def __init__(self) -> None:
+        pass
+
+    def create_resjson(self, path):
+        with open(path, 'w') as f:
+            json.dump([], f, indent=4, ensure_ascii=False)
+
+    def template_result(self,
+                        clip_name: str,
+                        sparse_label: list = None # FIXME
+                        ) -> dict:
+        if sparse_label is None:
+            # FIXME: sparse_label 은 반드시 입력해야 함.
+            sparse_label = [0]
+        assert len(sparse_label) > 0
+        return {
+            'clip_name': clip_name,
+            'sparse_label': sparse_label
+        }
+
+    # TODO: append() 메서드를 이용해 작성하도록 하면 더 좋음
+    def append_template(self,json_path, e):
+        with open(json_path, 'r') as f:
+            original = json.load(f)
+        assert type(original) is list
+        original.append(e)
+        with open(json_path, 'w') as f:
+            json.dump(original, f, indent=4, ensure_ascii=False)
+
+    def fn_videos(self):
+        return lambda d: d
+
+    def get_label(self, video: dict) -> list:
+        return video.get('sparse_label')
+
+    def get_clip_name(self, video: dict) -> str:
+        return video.get('clip_name')
+
+    def change_label(self, video: dict, labels: list):
+        assert 'sparse_label' in video
+        video['sparse_label'] = labels
+
+
+class WorkSpaceJsonManager(JsonManager):
+    def __init__(self) -> None:
+        pass
+
+    def create_wsjson(self, path):
         with open(path, 'w') as f:
             json.dump({'raws': []}, f, indent=4, ensure_ascii=False)
 
@@ -30,6 +80,7 @@ class WorkSpaceJsonManager():
     def fn_video(self, raw_idx: int):
         return lambda d: self.fn_raws()(d)[raw_idx]
 
+    # TODO: 부모 클래스로 이동
     def dump(self, json_path, d: dict, fn = None):
         """ 딕셔너리의 키가 json 파일에 존재하면 값을 덮어쓰고,
             존재하지 않으면 새로운 키-값 쌍을 json 파일의 특정 위치에 추가합니다.
@@ -50,6 +101,7 @@ class WorkSpaceJsonManager():
         with open(json_path, 'w') as f:
             json.dump(original, f, indent=4, ensure_ascii=False)
 
+    # TODO: 부모 클래스로 이동
     def append(self, json_path, e, fn = None):
         """ 딕셔너리의 키가 json 파일에 존재하고 이에 대응하는 값이 리스트면 값을 append 하고,
             존재하지 않으면 새로운 값을 json 파일의 특정 위치에 리스트 형태로 추가합니다.
@@ -102,7 +154,9 @@ class WorkSpacePathManager():
         self._parent_dir = parent_dir
         self._name_ws = name_ws
         self.ws_dir = os.path.join(self._parent_dir, self._name_ws)
+        self.result_dir = os.path.join(self.ws_dir, 'sparse-label')
         self.wsjson_path = os.path.join(self.ws_dir, 'workspace.json')
+        self.resjson_path = os.path.join(self.result_dir, 'result.json')
         self.raw_dir = os.path.join(self.ws_dir, 'raws')
 
     def get_raw_newstem(self,
