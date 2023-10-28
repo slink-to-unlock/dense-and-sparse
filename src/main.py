@@ -122,9 +122,9 @@ if __name__ == '__main__':
     try:
         create_workspace(wsjson_manager, '.', name_ws='test-ws')
     except FileExistsError:
-        logger.error('워크스페이스를 새로 만들 수 없습니다. '
-                     f'워크스페이스 `{wspath_manager.ws_dir}`가 이미 존재합니다.')
-        raise NotImplementedError()
+        e = ('워크스페이스를 새로 만들 수 없습니다. '
+            f'워크스페이스 `{wspath_manager.ws_dir}`가 이미 존재합니다.')
+        raise NotImplementedError(e)
 
     first = True
     while True:
