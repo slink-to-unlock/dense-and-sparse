@@ -188,6 +188,7 @@ Temporary Items
 .apdisk
 
 # Project
+sparse-label
 *.mov
 *-ws
 
