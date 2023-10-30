@@ -10,7 +10,7 @@ from .manager import WorkSpacePathManager, WorkSpaceJsonManager
 logger = logging.getLogger(__name__)
 
 
-def check_video(
+def mark_splittiming(
     video_path: os.PathLike
 ) -> list:
     clips = []
@@ -34,7 +34,7 @@ def split_video(
     raw_idx: int,
 ):
     video_path = wspath_manager.read_raw_path(wsjson_manager, raw_idx)
-    clips = check_video(video_path)
+    clips = mark_splittiming(video_path)
     # create split manifest file
     # NOTE: a manifest file is required to split a video file
     # to utilize thirdparty/video-splitter
