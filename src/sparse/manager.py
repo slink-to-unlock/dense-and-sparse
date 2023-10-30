@@ -28,7 +28,7 @@ class ResultJsonManager(JsonManager):
                         clip_name: str,
                         sparse_label: list = None # FIXME
                         ) -> dict:
-        if sparse_label is None:
+        if not sparse_label:
             # FIXME: sparse_label 은 반드시 입력해야 함.
             sparse_label = [0]
         assert len(sparse_label) > 0

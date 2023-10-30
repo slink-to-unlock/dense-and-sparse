@@ -77,34 +77,24 @@ def do_labeling(
     wspath_manager: WorkSpacePathManager,
     resjson_manager: ResultJsonManager
 ):
-    yes, no = '네', '아니오'
-    ret, _ = pick.pick(
-        [yes, no],
-        title='끊어낸 클립들에 대해 레이블링을 진행할까요?'
-    )
-    logger.info(
-        '모든 클립들에 대해 레이블링을 마치기 전 프로그램을 종료하면 '
-        '레이블링 결과물이 올바르게 저장되지 않습니다.'
-    )
-    if ret == yes:
-        with open(wspath_manager.resjson_path, 'r') as f:
-            d = json.load(f)
-        for i, video in enumerate(videos:=resjson_manager.fn_videos()(d)):
-            clip_name = resjson_manager.get_clip_name(video)
-            video_path = os.path.join(
-                wspath_manager.result_dir,
-                clip_name
-            )
-            logger.info(
-                f'총 {len(videos)}개의 비디오 중 '
-                f'{i}번째 비디오 `{clip_name}`를 엽니다.'
-            )
-            new_label = video_player(video_path)
-            logger.info(
-                '동영상의 레이블을 '
-                f'`{resjson_manager.get_label(video)}`에서 '
-                f'`{new_label}`(으)로 변경합니다.'
-            )
-            resjson_manager.change_label(video, new_label)
-        with open(wspath_manager.resjson_path, 'w') as f:
-            json.dump(d, f, indent=4, ensure_ascii=True)
+    with open(wspath_manager.resjson_path, 'r') as f:
+        d = json.load(f)
+    for i, video in enumerate(videos:=resjson_manager.fn_videos()(d)):
+        clip_name = resjson_manager.get_clip_name(video)
+        video_path = os.path.join(
+            wspath_manager.result_dir,
+            clip_name
+        )
+        logger.info(
+            f'총 {len(videos)}개의 비디오 중 '
+            f'{i}번째 비디오 `{clip_name}`를 엽니다.'
+        )
+        new_label = video_player(video_path)
+        logger.info(
+            '동영상의 레이블을 '
+            f'`{resjson_manager.get_label(video)}`에서 '
+            f'`{new_label}`(으)로 변경합니다.'
+        )
+        resjson_manager.change_label(video, new_label)
+    with open(wspath_manager.resjson_path, 'w') as f:
+        json.dump(d, f, indent=4, ensure_ascii=True)

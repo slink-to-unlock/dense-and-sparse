@@ -142,4 +142,11 @@ if __name__ == '__main__':
         logger.info('4초 뒤 다음 동영상을 선택합니다.')
         time.sleep(4)
     resjson_manager = collect(wspath_manager, wsjson_manager)
-    labeling.do_labeling(wspath_manager, resjson_manager)
+
+    yes, no = '네', '아니오'
+    ret, _ = pick.pick(
+        [yes, no],
+        title='끊어낸 클립들에 대해 레이블링을 진행할까요?'
+    )
+    if ret == yes:
+        labeling.do_labeling(wspath_manager, resjson_manager)
