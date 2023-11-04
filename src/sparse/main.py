@@ -79,8 +79,7 @@ def visualize_tree(
     wsjson_manager: WorkSpaceJsonManager
 ) -> None:
     tree = wspath_manager.get_videos_relationtree(wsjson_manager)
-    clear = lambda: os.system('clear')
-    clear()
+    os.system('cls' if os.name == 'nt' else 'clear')
     from anytree import RenderTree
     for pre, fill, node in RenderTree(tree):
         print("%s%s" % (pre, node.name))
