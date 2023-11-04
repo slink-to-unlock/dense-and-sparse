@@ -1,6 +1,6 @@
 # 빌트인
+import os
 import logging
-import typing
 
 # 서드파티
 import cv2
@@ -8,6 +8,7 @@ import cv2
 # 로거
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
 
 class Timing:
     def __init__(self, misec: int) -> None:
@@ -56,7 +57,9 @@ class Timing:
         }
 
 
-def videoplayer(video_path):
+def videoplayer(
+    video_path: os.PathLike
+):
     capture = cv2.VideoCapture(video_path)
     timings = [Timing(0)]
     while capture.isOpened():

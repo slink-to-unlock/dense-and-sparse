@@ -19,11 +19,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # 프로젝트
-from .manager import WorkSpacePathManager, WorkSpaceJsonManager
-from .manager import ResultJsonManager
-from . import copyutils
-from . import veditutils
-from . import labeling
+from src.utils import videocopy
+from src.sparse.utils import splitting
+from src.sparse.utils import labeling
+from src.core.manager import (
+    ResultJsonManager,
+    WorkSpacePathManager,
+    WorkSpaceJsonManager,
+)
 
 
 def create_workspace(
@@ -58,7 +61,7 @@ def copy_video(
         wspath_manager.set_clips_dir(wsjson_manager, video_path)
         dest_path = wspath_manager.read_raw_path(wsjson_manager, -1)
     logger.info(f'동영상 `{os.path.basename(video_path)}`를 복사합니다.')
-    copyutils.copy_with_callback(video_path, dest_path)
+    videocopy.copy_with_callback(video_path, dest_path)
 
 
 def cli_selector(
@@ -136,7 +139,7 @@ if __name__ == '__main__':
                 visualize_tree(wspath_manager, wsjson_manager)
                 break
             copy_video(wspath_manager, wsjson_manager, video_path)
-        veditutils.split_video(wspath_manager, wsjson_manager, -1)
+        splitting.split_video(wspath_manager, wsjson_manager, -1)
         visualize_tree(wspath_manager, wsjson_manager)
         logger.info('4초 뒤 다음 동영상을 선택합니다.')
         time.sleep(4)

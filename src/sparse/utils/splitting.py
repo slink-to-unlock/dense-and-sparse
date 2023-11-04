@@ -3,8 +3,12 @@ import json
 import logging
 import subprocess
 
-from .timing import videoplayer
-from .manager import WorkSpacePathManager, WorkSpaceJsonManager
+# 프로젝트
+from src.core.timing import videoplayer
+from src.core.manager import (
+    WorkSpacePathManager,
+    WorkSpaceJsonManager
+)
 
 # 로거
 logger = logging.getLogger(__name__)
