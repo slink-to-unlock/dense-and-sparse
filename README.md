@@ -34,7 +34,7 @@ labeling tool
 - 0을 눌러서 0으로 태깅, 1을 눌러서 1로 태깅
 - **NOTE**: 메타데이터 태깅 과정에서 동일한 작업을 GUI로 실행할 수 있으므로 이 과정을 생략해도 됨.
 
-### 실행 스크립트
+#### 실행 스크립트
 
 ```bash
 {프로젝트_루트}$ python -m src.sparse.main
@@ -42,10 +42,10 @@ labeling tool
 
 ### 메타데이터 태깅 실행
 
-### 실행 스크립트
+#### 실행 스크립트
 
 ```bash
-{프로젝트_루트}$ streamlit run src/app
+{프로젝트_루트}$ streamlit run src/app.py
 ```
 
 ## 가보자가보자
