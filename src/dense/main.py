@@ -131,7 +131,7 @@ def main():
     if not os.path.exists("./clip_frames"):
         os.makedirs("./clip_frames")  # 해당 경로 폴더 생성
 
-    with open("result.json", "r") as f:
+    with open(label_file, "r") as f:
         datas = json.load(f, strict=False)
     # print(json_data[0]['name'])
     root_path = "clips/"
@@ -144,7 +144,7 @@ def main():
         print("4. 키보드에서 'r'를 누르면 버리는 이미지에 해당합니다.")
         print("5. 이미지 경로에 존재하는 모든 이미지에 작업을 마친 경우 또는 'q'를 누르면(quit 약자) 프로그램이 종료됩니다.")
 
-        path = os.path.join(root_path, data["name"])  # clips/clip1.mp4
+        path = os.path.join(root_path, data["clip_name"])  # clips/clip1.mp4
         label = data["sparselabel"][0]
         frame_dir = video2imgs(path, fps)
 
