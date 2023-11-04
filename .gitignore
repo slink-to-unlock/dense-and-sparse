@@ -189,6 +189,8 @@ Temporary Items
 
 # Project
 sparse-label
+*.mpeg
+*.mp4
 *.mov
 *-ws
 
