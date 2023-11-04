@@ -35,9 +35,11 @@ def create_workspace(
     name_ws: str = 'anonymous-ws'
 ) -> WorkSpacePathManager:
     wspath_manager = WorkSpacePathManager(parent_dir, name_ws)
-    os.mkdir(wspath_manager.ws_dir)
+    os.makedirs(wspath_manager.ws_dir)
     logger.info(
         f'경로 `{os.path.abspath(parent_dir)}`에 워크스페이스 `{name_ws}`를 생성합니다.')
+    if os.listdir(wspath_manager.ws_dir):
+        raise FileExistsError
     os.mkdir(wspath_manager.raw_dir)
     wsjson_manager.create_wsjson(wspath_manager.wsjson_path)
     time.sleep(3)
@@ -125,7 +127,7 @@ if __name__ == '__main__':
         create_workspace(wsjson_manager, '.', name_ws='test-ws')
     except FileExistsError:
         e = ('워크스페이스를 새로 만들 수 없습니다. '
-            f'워크스페이스 `{wspath_manager.ws_dir}`가 이미 존재합니다.')
+            f'디렉토리 `{wspath_manager.ws_dir}`이 비어 있지 않습니다.')
         raise NotImplementedError(e)
 
     first = True
