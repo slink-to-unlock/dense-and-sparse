@@ -52,7 +52,7 @@ class Timing:
         if pad:
             raise NotImplementedError()
         return {
-            'start_time': self.to_stamp(),
+            'start_time': self.sec,
             'end_time': end.to_stamp(),
         }
 
