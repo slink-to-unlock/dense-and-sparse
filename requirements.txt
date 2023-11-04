@@ -2,3 +2,4 @@ pick
 anytree
 opencv-python
 natsort
+streamlit
