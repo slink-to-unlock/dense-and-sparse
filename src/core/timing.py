@@ -1,5 +1,4 @@
 # 빌트인
-import os
 import logging
 
 # 서드파티
@@ -59,5 +58,9 @@ class Timing:
             raise NotImplementedError()
         return {
             'start_time': self.sec,
-            'length': (end - self).sec, # FIXME: length
+            'length': (end - self).sec,
+            # NOTE: 이유는 정확히 모르겠으나,
+            # 일부 컴퓨터에서 ffmpeg의 'end_time' 옵션이
+            # 정상적으로 인식되지 않는 문제가 있으므로
+            # 되도록이면 `length` 옵션을 사용할 것
         }

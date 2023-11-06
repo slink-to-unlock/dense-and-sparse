@@ -85,13 +85,19 @@ def split_video(
     wsjson_manager: WorkSpaceJsonManager,
     raw_idx: int,
 ):
+    """비디오 클립의 목록에서 비디오를 선택해 분할합니다.
+    비디오를 분할하여 워크스페이스에 적절히 저장합니다.
+
+    Args:
+        raw_idx (int): `raw` 비디오 클립의 인덱스.
+            `-1`은 가장 최근에 추가된 비디오를 의미합니다.
+    """
     video_path = wspath_manager.read_raw_path(wsjson_manager, raw_idx)
     split_specs = get_split_specs(video_path)
+
     # create split manifest file
     # NOTE: a manifest file is required to split a video file
     # to utilize thirdparty/video-splitter
-    with open(wspath_manager.wsjson_path, 'r') as f:
-        d = json.load(f)
     for i, spec in enumerate(split_specs):
         stem, suffix = wspath_manager.read_raw_name(wsjson_manager)
         spec['rename_to'] = os.path.join(
@@ -102,12 +108,13 @@ def split_video(
         json.dump(split_specs, f, indent=4, ensure_ascii=False)
 
     # run python file
-    py = os.path.join('thirdparty', 'video-splitter', 'ffmpeg-split.py')
+    script = os.path.join('thirdparty', 'video-splitter', 'ffmpeg-split.py')
     splitjson_path = wspath_manager.read_splitmanifestfile_path(wsjson_manager, raw_idx)
     with open(wspath_manager.get_splitlogfile_path(wsjson_manager, -1), 'w') as f:
         subprocess.Popen([
-            'python', f'{py}',
+            'python', f'{script}',
             '-f', f'{video_path}',
             '-m', f'{splitjson_path}'
         ], stdout=f, stderr=f)
+
     logger.info('동영상을 클립으로 분해하는 작업이 완료되었습니다.')
