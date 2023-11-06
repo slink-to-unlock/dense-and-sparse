@@ -21,6 +21,12 @@ class Timing:
     def __str__(self) -> str:
         return self.to_stamp()
 
+    def __add__(self, timing):
+        return Timing(self.misec + timing.misec)
+
+    def __sub__(self, timing):
+        return Timing(self.misec - timing.misec)
+
     @property
     def misec(self) -> int:
         return self._misec
@@ -53,49 +59,5 @@ class Timing:
             raise NotImplementedError()
         return {
             'start_time': self.sec,
-            'end_time': end.to_stamp(),
+            'length': (end - self).sec, # FIXME: length
         }
-
-
-def videoplayer(
-    video_path: os.PathLike
-):
-    capture = cv2.VideoCapture(video_path)
-    timings = [Timing(0)]
-    while capture.isOpened():
-        run, frame = capture.read()
-        key = cv2.waitKeyEx(30)
-
-        if not run:
-            print("[프레임 수신 불가] - 종료합니다")
-            break
-
-        img = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
-        img = cv2.resize(img, (520, 520))
-        cv2.imshow('video', img)
-        if (_t:=int(capture.get(cv2.CAP_PROP_POS_MSEC))) >= 0:
-            prev_timing = Timing(_t)
-
-        if key == ord('s'):
-            cv2.waitKeyEx()
-        if key == ord('p'):
-            cv2.waitKeyEx(30)
-        if key == ord('q'):
-            # 프로그램 종료
-            break
-        if key == ord('t'):
-            timing = Timing(int(capture.get(cv2.CAP_PROP_POS_MSEC)))
-            logger.info(f'`{timing}`을 절단합니다.')
-            timings.append(timing)
-
-        if key == 0x250000:
-            current_time = capture.get(cv2.CAP_PROP_POS_MSEC)
-            capture.set(cv2.CAP_PROP_POS_MSEC, current_time - 1000)
-        if key == 0x270000:
-            current_time = capture.get(cv2.CAP_PROP_POS_MSEC)
-            capture.set(cv2.CAP_PROP_POS_MSEC, current_time + 1000)
-
-    capture.release()
-    cv2.destroyAllWindows()
-    timings.append(prev_timing)
-    return timings
