@@ -8,8 +8,11 @@ import cv2
 import pick
 
 # 프로젝트
-from .manager import WorkSpacePathManager, WorkSpaceJsonManager
-from .manager import ResultJsonManager
+from src.core.manager import (
+    ResultJsonManager,
+    WorkSpacePathManager,
+    WorkSpaceJsonManager
+)
 
 # 로거
 logger = logging.getLogger(__name__)
