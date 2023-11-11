@@ -4,8 +4,7 @@ import time
 
 import streamlit as st
 
-
-clips_directory = os.path.join('test-ws', 'sparse-label')
+clips_directory = os.path.join('volume', 'test-ws', 'sparse-label')
 label_json = os.path.join(clips_directory, 'result.json')
 
 
@@ -86,7 +85,7 @@ for video in videos:
     if video.get('clip_name') == os.path.basename(selected_video_path):
         video['sparse_label'] = [label]
         video['meta_info'] = {
-            "step": "애벌",
+            "step": 단계,
             "scrubber_holding_hand": 수세미를_든_손 == '보임',
             "dishes_holding_hand": 식기를_든_손 == '보임',
             "dishes_in_roi": 지정한_위치_내에_식기 == '예',
