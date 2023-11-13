@@ -5,7 +5,7 @@ import time
 import streamlit as st
 
 
-clips_directory = os.path.join('test-ws', 'sparse-label')
+clips_directory = os.path.join('volume/test-ws', 'sparse-label')
 label_json = os.path.join(clips_directory, 'result.json')
 
 
