@@ -49,10 +49,10 @@ def timing_collecter(
             logger.info(f'`{timing}`을 절단합니다.')
             timings.append(timing)
 
-        if key == 0x250000:
+        if key == ord(','):
             current_time = capture.get(cv2.CAP_PROP_POS_MSEC)
             capture.set(cv2.CAP_PROP_POS_MSEC, current_time - 1000)
-        if key == 0x270000:
+        if key == ord('.'):
             current_time = capture.get(cv2.CAP_PROP_POS_MSEC)
             capture.set(cv2.CAP_PROP_POS_MSEC, current_time + 1000)
 
