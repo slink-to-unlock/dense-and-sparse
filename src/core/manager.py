@@ -145,15 +145,16 @@ class WorkSpaceJsonManager(JsonManager):
             'clips_dir': clips_dir
         }
 
+
 class WorkSpacePathManager():
     """ 경로와 관련된 작업을 하는 클래스
         NOTE: 이 클래스는 절대 json파일의 키를 직접 읽거나 쓰지 않습니다.
         반드시 WorkSpaceJsonManager을 통해서만 상호작용합니다.
     """
     def __init__(self, parent_dir, name_ws) -> None:
-        self._parent_dir = parent_dir
-        self._name_ws = name_ws
-        self.ws_dir = os.path.join(self._parent_dir, self._name_ws)
+        self.parent_dir = parent_dir
+        self.name_ws = name_ws
+        self.ws_dir = os.path.join(self.parent_dir, self.name_ws)
         self.result_dir = os.path.join(self.ws_dir, 'sparse-label')
         self.wsjson_path = os.path.join(self.ws_dir, 'workspace.json')
         self.resjson_path = os.path.join(self.result_dir, 'result.json')
@@ -268,7 +269,7 @@ class WorkSpacePathManager():
         with open(self.wsjson_path, 'r') as f:
             d = json.load(f)
 
-        root = anytree.Node(self._name_ws)
+        root = anytree.Node(self.name_ws)
         for idx, e in enumerate(wsjson_manager.fn_raws()(d)):
             # 1. 트리에서 해당 이름의 노드가 있는지 찾는다.
             name = e.get('raw_name')

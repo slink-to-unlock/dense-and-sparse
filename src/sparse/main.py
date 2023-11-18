@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 # 프로젝트
 from src.utils import videocopy
-from src.sparse.utils import splitting
+from src.sparse.utils.splitting import split_video
 from src.sparse.utils import labeling
 from src.core.manager import (
     ResultJsonManager,
@@ -31,13 +31,12 @@ from src.core.manager import (
 
 def create_workspace(
     wsjson_manager: WorkSpaceJsonManager,
-    parent_dir: os.PathLike,
-    name_ws: str = 'anonymous-ws'
+    wspath_manager: WorkSpacePathManager
 ) -> WorkSpacePathManager:
-    wspath_manager = WorkSpacePathManager(parent_dir, name_ws)
     os.makedirs(wspath_manager.ws_dir)
     logger.info(
-        f'경로 `{os.path.abspath(parent_dir)}`에 워크스페이스 `{name_ws}`를 생성합니다.')
+        f'경로 `{os.path.abspath(wspath_manager.parent_dir)}`에 '
+        f'워크스페이스 `{wspath_manager.name_ws}`를 생성합니다.')
     if os.listdir(wspath_manager.ws_dir):
         raise FileExistsError
     os.mkdir(wspath_manager.raw_dir)
@@ -122,26 +121,26 @@ def collect(
 
 if __name__ == '__main__':
     wsjson_manager = WorkSpaceJsonManager()
-    wspath_manager = WorkSpacePathManager('.', 'test-ws')
+    wspath_manager = WorkSpacePathManager('volume', 'test-ws')
     try:
-        create_workspace(wsjson_manager, '.', name_ws='test-ws')
+        create_workspace(wsjson_manager, wspath_manager)
     except FileExistsError:
         e = ('워크스페이스를 새로 만들 수 없습니다. '
             f'디렉토리 `{wspath_manager.ws_dir}`이 비어 있지 않습니다.')
         raise NotImplementedError(e)
 
-    first = True
+    is_initial_video = True
     while True:
-        if first:
-            copy_video(wspath_manager, wsjson_manager, '연호설거지_1.MOV.mov')
-            first = False
+        if is_initial_video:
+            copy_video(wspath_manager, wsjson_manager, '성운설거지_1.MOV.mov')
+            is_initial_video = False
         else:
             _, video_path = cli_selector(wspath_manager, wsjson_manager)
             if video_path is None:
                 visualize_tree(wspath_manager, wsjson_manager)
                 break
             copy_video(wspath_manager, wsjson_manager, video_path)
-        splitting.split_video(wspath_manager, wsjson_manager, -1)
+        split_video(wspath_manager, wsjson_manager, -1)
         visualize_tree(wspath_manager, wsjson_manager)
         logger.info('4초 뒤 다음 동영상을 선택합니다.')
         time.sleep(4)

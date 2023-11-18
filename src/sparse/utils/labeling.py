@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def video_player(
+def video_labeler(
     video_path: os.PathLike
 ) -> list:
     assert os.path.isfile(video_path)
@@ -92,7 +92,7 @@ def do_labeling(
             f'총 {len(videos)}개의 비디오 중 '
             f'{i}번째 비디오 `{clip_name}`를 엽니다.'
         )
-        new_label = video_player(video_path)
+        new_label = video_labeler(video_path)
         logger.info(
             '동영상의 레이블을 '
             f'`{resjson_manager.get_label(video)}`에서 '
