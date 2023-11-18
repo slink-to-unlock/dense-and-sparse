@@ -129,11 +129,11 @@ if __name__ == '__main__':
             f'디렉토리 `{wspath_manager.ws_dir}`이 비어 있지 않습니다.')
         raise NotImplementedError(e)
 
-    first = True
+    is_initial_video = True
     while True:
-        if first:
-            copy_video(wspath_manager, wsjson_manager, '연호설거지_1.MOV.mov')
-            first = False
+        if is_initial_video:
+            copy_video(wspath_manager, wsjson_manager, '성운설거지_1.MOV.mov')
+            is_initial_video = False
         else:
             _, video_path = cli_selector(wspath_manager, wsjson_manager)
             if video_path is None:
