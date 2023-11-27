@@ -194,5 +194,8 @@ sparse-label
 *.mov
 *-ws
 
+# datasets
+form_teachable
+
 # vscode
 .vscode
