@@ -122,28 +122,28 @@ def collect(
 if __name__ == '__main__':
     wsjson_manager = WorkSpaceJsonManager()
     wspath_manager = WorkSpacePathManager('volume', 'test-ws')
-    # try:
-    #     create_workspace(wsjson_manager, wspath_manager)
-    # except FileExistsError:
-    #     e = ('워크스페이스를 새로 만들 수 없습니다. '
-    #         f'디렉토리 `{wspath_manager.ws_dir}`이 비어 있지 않습니다.')
-    #     raise NotImplementedError(e)
+    try:
+        create_workspace(wsjson_manager, wspath_manager)
+    except FileExistsError:
+        e = ('워크스페이스를 새로 만들 수 없습니다. '
+            f'디렉토리 `{wspath_manager.ws_dir}`이 비어 있지 않습니다.')
+        raise NotImplementedError(e)
 
-    # first = True
-    # while True:
-    #     if first:
-    #         copy_video(wspath_manager, wsjson_manager, '연호설거지_1.MOV.mov')
-    #         first = False
-    #     else:
-    #         _, video_path = cli_selector(wspath_manager, wsjson_manager)
-    #         if video_path is None:
-    #             visualize_tree(wspath_manager, wsjson_manager)
-    #             break
-    #         copy_video(wspath_manager, wsjson_manager, video_path)
-    #     split_video(wspath_manager, wsjson_manager, -1)
-    #     visualize_tree(wspath_manager, wsjson_manager)
-    #     logger.info('4초 뒤 다음 동영상을 선택합니다.')
-    #     time.sleep(4)
+    first = True
+    while True:
+        if first:
+            copy_video(wspath_manager, wsjson_manager, '연호설거지_1.MOV.mov')
+            first = False
+        else:
+            _, video_path = cli_selector(wspath_manager, wsjson_manager)
+            if video_path is None:
+                visualize_tree(wspath_manager, wsjson_manager)
+                break
+            copy_video(wspath_manager, wsjson_manager, video_path)
+        split_video(wspath_manager, wsjson_manager, -1)
+        visualize_tree(wspath_manager, wsjson_manager)
+        logger.info('4초 뒤 다음 동영상을 선택합니다.')
+        time.sleep(4)
     resjson_manager = collect(wspath_manager, wsjson_manager)
 
     yes, no = '네', '아니오'
