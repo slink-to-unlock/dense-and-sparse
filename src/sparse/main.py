@@ -68,7 +68,7 @@ def copy_video(
 def cli_selector(
     wspath_manager: WorkSpaceJsonManager,
     wsjson_manager: WorkSpaceJsonManager
-) -> (int, os.PathLike):
+) -> tuple[int, os.PathLike]:
     li = wspath_manager.atomic_videos(wsjson_manager)
     ret, idx = pick.pick([e.name for e in li] + ['exit'])
     if ret == 'exit':
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     is_initial_video = True
     while True:
         if is_initial_video:
-            copy_video(wspath_manager, wsjson_manager, '성운설거지_1.MOV.mov')
+            copy_video(wspath_manager, wsjson_manager, '성운설거지_squared.mov')
             is_initial_video = False
         else:
             _, video_path = cli_selector(wspath_manager, wsjson_manager)
