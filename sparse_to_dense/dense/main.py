@@ -5,9 +5,11 @@ import json
 import natsort
 
 
-def video2imgs(path, fps):  # clips/clip1.mp4 -> clip_frames/clip1
-    id = path.split("/")[-1][:-4]  # clip1
-    save_dir = os.path.join("clip_frames/", id)
+def video2imgs(path, fps):  #volume/test-ws/sparse-label/clip1.mp4 -> clip_frames/clip1
+    # id = path.split("/")[-1][:-4]  # clip1
+    id = os.path.basename(path) #clip1.mp4
+    id = id.split('.')[0] #clip1
+    save_dir = os.path.join("volume","test-ws","clip_frames", id) #volume/test-ws/clip_frames/clip1
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)  # 해당 경로 폴더 생성
     vidcap = cv2.VideoCapture(path)  # 비디오 읽어오기
@@ -44,7 +46,7 @@ def video2imgs(path, fps):  # clips/clip1.mp4 -> clip_frames/clip1
     return save_dir
 
 
-def DenseModule(frame_dir, image_names, label, sampling, size):
+def DenseModule(frame_dir, image_names, label, sampling, size): #frame_dir: volume/test-ws/clip_frames/clip1
     cv2.namedWindow("image")
 
     for idx, image_name in enumerate(image_names):
@@ -62,12 +64,14 @@ def DenseModule(frame_dir, image_names, label, sampling, size):
                 key = cv2.waitKey(0)
 
                 if key == ord("0"):
-                    new_dir = "./0/" + frame_dir.split("/")[-1] + "_" + image_name
+                    new_dir = os.path.basename(frame_dir) + "_" + image_name
+                    new_dir = os.path.join('volume','test-ws','0', new_dir)
                     cv2.imwrite(new_dir, image)
                     break
 
                 if key == ord("1"):
-                    new_dir = "./1/" + frame_dir.split("/")[-1] + "_" + image_name
+                    new_dir = os.path.basename(frame_dir) + "_" + image_name
+                    new_dir = os.path.join('volume','test-ws','1', new_dir)
                     cv2.imwrite(new_dir, image)
                     break
 
@@ -83,11 +87,13 @@ def DenseModule(frame_dir, image_names, label, sampling, size):
             cv2.destroyAllWindows()
             flag = False
             if label == 0:
-                new_dir = "./0/" + frame_dir.split("/")[-1] + "_" + image_name
+                new_dir = os.path.basename(frame_dir) + "_" + image_name
+                new_dir = os.path.join('volume','test-ws','0',new_dir)
                 print(new_dir)
                 cv2.imwrite(new_dir, image)
             elif label == 1:
-                new_dir = "./1/" + frame_dir.split("/")[-1] + "_" + image_name
+                new_dir = os.path.basename(frame_dir) + "_" + image_name
+                new_dir = os.path.join('volume','test-ws','1', new_dir)
                 print(new_dir)
                 cv2.imwrite(new_dir, image)
 
@@ -124,17 +130,17 @@ def main():
     # 이미지 디렉토리 경로를 입력 받는다.
     folder, label_file, fps, sampling, size = GetArgument()
 
-    if not os.path.exists("./0"):
-        os.makedirs("./0")  # 해당 경로 폴더 생성
-    if not os.path.exists("./1"):
-        os.makedirs("./1")  # 해당 경로 폴더 생성
-    if not os.path.exists("./clip_frames"):
-        os.makedirs("./clip_frames")  # 해당 경로 폴더 생성
+    if not os.path.exists("./volume/test-ws/0"):
+        os.makedirs("./volume/test-ws/0")  # 해당 경로 폴더 생성
+    if not os.path.exists("./volume/test-ws/1"):
+        os.makedirs("./volume/test-ws/1")  # 해당 경로 폴더 생성
+    if not os.path.exists("./volume/test-ws/clip_frames"):
+        os.makedirs("./volume/test-ws/clip_frames")  # 해당 경로 폴더 생성
 
-    with open("result.json", "r") as f:
+    with open(label_file, "r") as f:
         datas = json.load(f, strict=False)
     # print(json_data[0]['name'])
-    root_path = "clips/"
+    # root_path = "clips/"
 
     for data in datas:
         print("\n")
@@ -144,15 +150,18 @@ def main():
         print("4. 키보드에서 'r'를 누르면 버리는 이미지에 해당합니다.")
         print("5. 이미지 경로에 존재하는 모든 이미지에 작업을 마친 경우 또는 'q'를 누르면(quit 약자) 프로그램이 종료됩니다.")
 
-        path = os.path.join(root_path, data["name"])  # clips/clip1.mp4
-        label = data["sparselabel"][0]
-        frame_dir = video2imgs(path, fps)
+        path = os.path.join(folder, data["clip_name"])  # volume/test-ws/sparse-label/clip1.mp4
+        label = data["sparse_label"][0]
+        if label == -1:
+            continue
+
+        frame_dir = video2imgs(path, fps) #frame_dir: volume/test-ws/clip_frames/clip1
+        print(data)
 
         # 이미지로 저장된 폴더명을 받는다.
         image_names = os.listdir(frame_dir)  # images list
         image_names = natsort.natsorted(image_names)  # sort images list
         # print(image_names)
-
         DenseModule(frame_dir, image_names, label, sampling, size)
 
         # create new window
