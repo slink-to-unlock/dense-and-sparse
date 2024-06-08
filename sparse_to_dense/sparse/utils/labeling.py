@@ -8,7 +8,7 @@ import cv2
 import pick
 
 # 프로젝트
-from src.core.manager import (
+from sparse_to_dense.core.manager import (
     ResultJsonManager,
     WorkSpacePathManager,
     WorkSpaceJsonManager

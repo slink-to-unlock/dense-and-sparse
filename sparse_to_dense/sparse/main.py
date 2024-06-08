@@ -19,10 +19,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # 프로젝트
-from src.utils import videocopy
-from src.sparse.utils.splitting import split_video
-from src.sparse.utils import labeling
-from src.core.manager import (
+from sparse_to_dense.utils import videocopy
+from sparse_to_dense.sparse.utils.splitting import split_video
+from sparse_to_dense.sparse.utils import labeling
+from sparse_to_dense.core.manager import (
     ResultJsonManager,
     WorkSpacePathManager,
     WorkSpaceJsonManager,
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     first = True
     while True:
         if first:
-            copy_video(wspath_manager, wsjson_manager, '연호설거지_1.MOV.mov')
+            copy_video(wspath_manager, wsjson_manager, 'source.mov')
             first = False
         else:
             _, video_path = cli_selector(wspath_manager, wsjson_manager)

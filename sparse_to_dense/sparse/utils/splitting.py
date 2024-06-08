@@ -8,8 +8,9 @@ import subprocess
 import cv2
 
 # 프로젝트
-from src.core.timing import Timing
-from src.core.manager import (
+from sparse_to_dense import video_splitter_path
+from sparse_to_dense.core.timing import Timing
+from sparse_to_dense.core.manager import (
     WorkSpacePathManager,
     WorkSpaceJsonManager
 )
@@ -108,7 +109,7 @@ def split_video(
         json.dump(split_specs, f, indent=4, ensure_ascii=False)
 
     # run python file
-    script = os.path.join('thirdparty', 'video-splitter', 'ffmpeg-split.py')
+    script = os.path.join(os.path.abspath(video_splitter_path), 'ffmpeg-split.py')
     splitjson_path = wspath_manager.read_splitmanifestfile_path(wsjson_manager, raw_idx)
     with open(wspath_manager.get_splitlogfile_path(wsjson_manager, -1), 'w') as f:
         subprocess.Popen([

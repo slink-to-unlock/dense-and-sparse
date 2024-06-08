@@ -1,3 +1,3 @@
 [submodule "thirdparty/video-splitter"]
-	path = thirdparty/video-splitter
+	path = sparse_to_dense/submodules/video-splitter
 	url = https://github.com/c0decracker/video-splitter.git

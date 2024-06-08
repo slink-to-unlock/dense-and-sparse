@@ -15,8 +15,8 @@ cd sparse-to-dense
 
 ### 파일 준비
 
-- `연호설거지_1.MOV` 파일을 프로젝트 루트에 준비
-- 다른 이름의 파일을 실행하고 싶다면 `src/sparse/main.py` 파일을 수정할 것.
+- `source.mov` 파일을 프로젝트 루트에 준비
+- 다른 이름의 파일을 실행하고 싶다면 `sparse_to_dense/sparse/main.py` 파일을 수정할 것.
 
 ### 파이썬 의존성 설치
 
@@ -49,7 +49,7 @@ cd sparse-to-dense
 #### 실행 스크립트
 
 ```bash
-{프로젝트_루트}$ python -m src.sparse.main
+{프로젝트_루트}$ python -m sparse_to_dense.sparse.main
 ```
 
 ### 메타데이터 태깅 실행
@@ -57,7 +57,7 @@ cd sparse-to-dense
 #### 실행 스크립트
 
 ```bash
-{프로젝트_루트}$ streamlit run src/app.py
+{프로젝트_루트}$ streamlit run sparse_to_dense/app.py
 ```
 
 ## 가보자가보자
