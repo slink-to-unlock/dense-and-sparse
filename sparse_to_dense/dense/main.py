@@ -108,10 +108,10 @@ def GetArgument():
     ap = argparse.ArgumentParser()
     ap.add_argument("--folder", required=True, help="Enter the clip folder")
     ap.add_argument(
-        "--fps", default=15, help="Enter the fps to convert image.(default = 15)"
+        "--fps", default=15, help="비디오를 이미지로 슬라이싱할 때 기준으로 삼을 초당 프레임 수입니다."
     )
     ap.add_argument(
-        "--sampling", default=30, help="Enter the frame number to check.(default = 20)"
+        "--sampling", default=30, help="비디오의 앞/뒤 부분을 자세히 살펴보면서 나머지 부분을 레이블링합니다. 자세히 살펴볼 프레임의 길이입니다."
     )
     ap.add_argument("--label_file", required=True, help="Enter the label file of clip.")
     ap.add_argument(
