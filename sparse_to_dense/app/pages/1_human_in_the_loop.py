@@ -1,10 +1,16 @@
-import streamlit as st
-import pandas as pd
+# 내장
 import os
 import json
 import shutil
 import datetime
+
+# 서드파티
 from PIL import Image
+import streamlit as st
+import pandas as pd
+
+# 프로젝트
+from autosink_data_elt.path.autosink import AutosinkPath
 
 
 def list_directories(path):
@@ -12,11 +18,13 @@ def list_directories(path):
     directories = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
     return directories
 
+
 def get_files(directory):
     """디렉토리 내의 모든 파일들을 JSON 파일로 분류하여 반환"""
     files = os.listdir(directory)
     json_file = [f for f in files if f.endswith('.json')]
     return json_file[0] if json_file else None
+
 
 def load_json(directory, file_name):
     """JSON 파일을 로드하고 내용을 반환. 파일은 다음과 같은 형태.
@@ -43,18 +51,22 @@ def load_json(directory, file_name):
     with open(os.path.join(directory, file_name), 'r') as file:
         return json.load(file)
 
+
 def save_json(directory, file_name, data):
     """JSON 데이터를 파일로 저장"""
     with open(os.path.join(directory, file_name), 'w') as file:
         json.dump(data, file, indent=4)
 
+
 def label_to_int(label):
     """레이블을 내부 정수로 변환"""
     return 1 if label == "Turn on" else 0
 
+
 def int_to_label(value):
     """내부 정수를 사용자 레이블로 변환"""
     return "Turn on" if value == 1 else "Turn off"
+
 
 def copy_and_organize_images(directory, interactions):
     """Validated 이미지를 각각의 폴더로 복사"""
@@ -69,10 +81,12 @@ def copy_and_organize_images(directory, interactions):
     # Mark directory as pushed
     return True
 
-def app():
+
+def app(autosink_path: AutosinkPath):
     st.title('Continuous Labeling')
 
-    base_path = 'volume/data-lake'
+    # base_path = 'volume/data-lake'
+    base_path = autosink_path.data_lake_dir()
     directories = list_directories(base_path)
 
     directory_info = []
@@ -86,11 +100,13 @@ def app():
         else:
             last_pushed = 'Not yet pushed'
             last_updated = 'Not yet updated'
-        directory_info.append({
-            'Directory Name': directory,
-            'Last Pushed to Feature Store': last_pushed,
-            'Last Updated in Data Lake': last_updated
-        })
+        directory_info.append(
+            {
+                'Directory Name': directory,
+                'Last Pushed to Feature Store': last_pushed,
+                'Last Updated in Data Lake': last_updated
+            }
+        )
 
     df = pd.DataFrame(directory_info)
     st.table(df)
@@ -106,7 +122,9 @@ def app():
             feature_store_pushed = data.get('pushed_to_feature_store', False)
 
             total_images = len(interactions)
-            unvalidated_images = sum(1 for interaction in interactions if not interaction.get('validation', False))
+            unvalidated_images = sum(
+                1 for interaction in interactions if not interaction.get('validation', False)
+            )
 
             col1, col2 = st.columns(2)
             with col1:
@@ -131,7 +149,10 @@ def app():
                 image = Image.open(os.path.join(full_path, image_path))
                 st.image(image, caption=f'Autolabel: {int_to_label(auto_label)}')
 
-            new_user_label = st.radio(f'Label for {image_path}:', ['Turn on', 'Turn off'], index=['Turn on', 'Turn off'].index(user_label))
+            new_user_label = st.radio(
+                f'Label for {image_path}:', ['Turn on', 'Turn off'],
+                index=['Turn on', 'Turn off'].index(user_label)
+            )
             if st.button(f'Validate Label for {image_path}'):
                 interactions[image_index]['user_label'] = label_to_int(new_user_label)
                 interactions[image_index]['validation'] = True
@@ -146,9 +167,13 @@ def app():
                     data['last_pushed_to_feature_store'] = str(datetime.datetime.now())
                     save_json(full_path, json_file, data)
                     st.success("Images have been successfully pushed to feature-store.")
-                    
+
         else:
             st.error('No JSON file found in the selected directory.')
 
+
 if __name__ == '__main__':
-    app()
+    if 'autosink_path' not in st.session_state:
+        st.session_state['autosink_path'] = AutosinkPath()
+    autosink_path = st.session_state.get('autosink_path')
+    app(autosink_path)

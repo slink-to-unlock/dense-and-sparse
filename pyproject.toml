@@ -23,6 +23,7 @@ dependencies = [
     "opencv-python",
     "natsort",
     "streamlit",
+    "autosink-data-elt",
 ]
 
 [project.scripts]
