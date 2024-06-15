@@ -86,7 +86,7 @@ def app(autosink_path: AutosinkPath):
     st.title('Continuous Labeling')
 
     # base_path = 'volume/data-lake'
-    base_path = autosink_path.data_lake_dir()
+    base_path = autosink_path.data_lake_dir
     directories = list_directories(base_path)
 
     directory_info = []
