@@ -3,14 +3,12 @@ import os
 import json
 import shutil
 import datetime
+from typing import Optional, Union
 
 # 서드파티
 from PIL import Image
 import streamlit as st
 import pandas as pd
-
-# 프로젝트
-from autosink_data_elt.path.autosink import AutosinkPath
 
 
 def list_directories(path):
@@ -82,11 +80,14 @@ def copy_and_organize_images(directory, interactions):
     return True
 
 
-def app(autosink_path: AutosinkPath):
+def app(workspace_path: Optional[Union[os.PathLike, str]] = None):
+    if workspace_path is None:
+        workspace_path = st.session_state.get('workspace_path')
+
     st.title('Continuous Labeling')
 
     # base_path = 'volume/data-lake'
-    base_path = autosink_path.data_lake_dir
+    base_path = workspace_path
     directories = list_directories(base_path)
 
     directory_info = []
@@ -173,7 +174,4 @@ def app(autosink_path: AutosinkPath):
 
 
 if __name__ == '__main__':
-    if 'autosink_path' not in st.session_state:
-        st.session_state['autosink_path'] = AutosinkPath()
-    autosink_path = st.session_state.get('autosink_path')
-    app(autosink_path)
+    app()
