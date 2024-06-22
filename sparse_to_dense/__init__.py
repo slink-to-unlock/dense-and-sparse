@@ -3,7 +3,11 @@
 import sys
 import os
 
-video_splitter_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'submodules', 'video-splitter')
+video_splitter_path = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), 'submodules', 'video-splitter'
+)
 
 if video_splitter_path not in sys.path:
     sys.path.append(video_splitter_path)
+
+streamlit_home_py_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app', 'home.py')

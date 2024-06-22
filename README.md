@@ -57,7 +57,7 @@ cd sparse-to-dense
 #### 실행 스크립트
 
 ```bash
-{프로젝트_루트}$ streamlit run sparse_to_dense/app.py
+{프로젝트_루트}$ streamlit run sparse_to_dense/app/home.py
 ```
 
 ## 가보자가보자
