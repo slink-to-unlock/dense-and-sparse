@@ -1,8 +1,8 @@
+# 내장
 import argparse
-import streamlit as st
 
-# 프로젝트
-from autosink_data_elt.path.autosink import AutosinkPath
+# 서드파티
+import streamlit as st
 
 
 def parse_arguments():
@@ -10,8 +10,17 @@ def parse_arguments():
     parser.add_argument(
         '--workspace_path',
         type=str,
-        default=AutosinkPath().data_lake_dir,
+        required=True,
         help='레이블링 작업을 수행할 워크스페이스 디렉토리 경로입니다.',
+    )
+    parser.add_argument(
+        '--feature_store_path',
+        type=str,
+        required=True,
+        help=(
+            '정제가 완료된 데이터셋을 저장하는 경로입니다. '
+            '버전을 포함한 최종 디렉토리 경로를 지정해 주어야 합니다. (e.g. feature-store/train/v7)'
+        ),
     )
     return parser.parse_args()
 
@@ -25,6 +34,8 @@ args = parse_arguments()
 
 if 'workspace_path' not in st.session_state:
     st.session_state['workspace_path'] = args.workspace_path
+if 'feature_store_path' not in st.session_state:
+    st.session_state['feature_store_path'] = args.feature_store_path
 
 st.write("# Data Labeling Tool 👋")
 
