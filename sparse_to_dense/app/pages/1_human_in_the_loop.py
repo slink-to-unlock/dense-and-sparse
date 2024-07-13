@@ -68,6 +68,7 @@ def int_to_label(value):
 
 def copy_and_organize_images(directory, interactions, feature_store_path):
     """ Validated 이미지를 각각의 폴더로 복사 """
+    copy_cnt = 0
     for i, interaction in enumerate(interactions):
         if interaction.get('validation', False):  # Only copy validated images
             image_path = os.path.join(directory, interaction['image'])
@@ -76,6 +77,14 @@ def copy_and_organize_images(directory, interactions, feature_store_path):
             os.makedirs(target_folder, exist_ok=True)
             new_name = f"{os.path.basename(directory)}-{i}.{image_path.split('.')[-1]}"
             shutil.copy(image_path, os.path.join(target_folder, new_name))
+
+            copy_cnt += 1
+    # NOTE: DEBUG
+    st.info(f'{copy_cnt} files copied into {feature_store_path}')
+    if copy_cnt:
+        assert os.listdir(
+            feature_store_path
+        ), f'file not exists in {feature_store_path} even though {copy_cnt} files copied.'
     # Mark directory as pushed
     return True
 
